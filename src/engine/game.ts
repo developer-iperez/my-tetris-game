@@ -17,6 +17,8 @@ export class Game {
   lines = 0;
   level = 1;
   isGameOver = false;
+  // Exposed so a future options menu can toggle it at runtime.
+  ghostPieceEnabled = true;
 
   constructor(width: number = BOARD_WIDTH, height: number = BOARD_HEIGHT) {
     this.board = new Board(width, height);
@@ -78,6 +80,24 @@ export class Game {
     this.lines = 0;
     this.level = 1;
     this.isGameOver = false;
+  }
+
+  setGhostPieceEnabled(enabled: boolean): void {
+    this.ghostPieceEnabled = enabled;
+  }
+
+  // Returns where `current` would land on hard drop, without mutating state.
+  // Returns null when the ghost piece is disabled or the game has ended.
+  getGhostPiece(): Piece | null {
+    if (!this.ghostPieceEnabled || this.isGameOver) return null;
+
+    let ghost = this.current.clone();
+    for (;;) {
+      const candidate = ghost.clone();
+      candidate.y += 1;
+      if (!this.board.isValidPosition(candidate.getAbsoluteCells())) return ghost;
+      ghost = candidate;
+    }
   }
 
   getDropIntervalMs(): number {

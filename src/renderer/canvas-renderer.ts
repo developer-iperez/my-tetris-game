@@ -26,6 +26,13 @@ export class CanvasRenderer {
       }
     }
 
+    const ghost = game.getGhostPiece();
+    if (ghost) {
+      ghost.getAbsoluteCells().forEach(({ x, y }) => {
+        if (y >= 0) this.drawGhostCell(x, y, PIECE_COLORS[ghost.type]);
+      });
+    }
+
     game.current.getAbsoluteCells().forEach(({ x, y }) => {
       if (y >= 0) this.drawCell(x, y, PIECE_COLORS[game.current.type]);
     });
@@ -36,6 +43,17 @@ export class CanvasRenderer {
     ctx.fillStyle = color;
     ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
     ctx.strokeStyle = GRID_COLOR;
+    ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
+  }
+
+  private drawGhostCell(x: number, y: number, color: string): void {
+    const { ctx, cellSize } = this;
+    ctx.save();
+    ctx.globalAlpha = 0.25;
+    ctx.fillStyle = color;
+    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    ctx.restore();
+    ctx.strokeStyle = color;
     ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
   }
 }
