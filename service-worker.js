@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tetris-cache-v4';
+const CACHE_NAME = 'tetris-cache-v5';
 const CACHED_ASSETS = [
   '.',
   'index.html',
@@ -11,8 +11,11 @@ const CACHED_ASSETS = [
   'dist/renderer/canvas-renderer.js',
   'dist/renderer/next-piece-renderer.js',
   'dist/ui/keyboard-controls.js',
+  'dist/ui/touch-controls.js',
   'dist/ui/hud.js',
+  'dist/ui/screens.js',
   'dist/storage/high-score-store.js',
+  'dist/storage/onboarding-store.js',
   'manifest.json',
 ];
 

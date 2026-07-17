@@ -3,6 +3,10 @@ export const BOARD_HEIGHT = 20;
 
 export type PieceType = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L';
 
+export type GameMode = 'marathon' | 'sprint';
+
+export const SPRINT_TARGET_LINES = 40;
+
 export interface Point {
   x: number;
   y: number;

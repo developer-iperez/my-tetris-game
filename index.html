@@ -2,33 +2,131 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Tetris</title>
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#111111" />
 </head>
 <body>
-  <main class="game">
-    <h1>Tetris</h1>
-    <canvas id="board" width="300" height="600"></canvas>
-    <aside class="hud">
-      <div class="next-piece">
-        <p>Siguiente:</p>
-        <canvas id="next-piece" width="80" height="80"></canvas>
+  <main class="app">
+    <section id="screen-menu" class="screen">
+      <h1 tabindex="-1" data-screen-focus>Tetris</h1>
+      <p class="menu-high-score">Mejor puntuación: <span id="menu-high-score">0</span></p>
+
+      <div class="option-group" role="group" aria-label="Modo de juego">
+        <span class="option-group-label">Modo</span>
+        <div class="segmented">
+          <button type="button" id="mode-marathon" class="segmented-btn" aria-pressed="true">Marathon</button>
+          <button type="button" id="mode-sprint" class="segmented-btn" aria-pressed="false">Sprint (40 líneas)</button>
+        </div>
       </div>
-      <p>Puntuación: <span id="score">0</span></p>
-      <p>Líneas: <span id="lines">0</span></p>
-      <p>Nivel: <span id="level">1</span></p>
-      <p>Mejor puntuación: <span id="high-score">0</span></p>
-      <p id="new-high-score" hidden>¡Nueva puntuación máxima!</p>
-      <p id="game-over" hidden>Game Over</p>
-      <p id="paused" hidden>Pausa</p>
-      <div class="controls">
-        <button id="pause-btn" type="button">Pausa</button>
-        <button id="restart-btn" type="button">Reiniciar</button>
+
+      <div class="option-group" role="group" aria-label="Dificultad">
+        <span class="option-group-label">Dificultad</span>
+        <div class="segmented">
+          <button type="button" id="difficulty-easy" class="segmented-btn" aria-pressed="false">Fácil</button>
+          <button type="button" id="difficulty-normal" class="segmented-btn" aria-pressed="true">Normal</button>
+          <button type="button" id="difficulty-hard" class="segmented-btn" aria-pressed="false">Difícil</button>
+        </div>
       </div>
-    </aside>
+
+      <div class="menu-actions">
+        <button type="button" id="play-btn" class="primary-btn">Jugar</button>
+        <button type="button" id="help-btn">Cómo jugar</button>
+      </div>
+    </section>
+
+    <section id="screen-help" class="screen" hidden>
+      <h1 tabindex="-1" data-screen-focus>Cómo jugar</h1>
+      <div class="help-content">
+        <h2>Teclado</h2>
+        <ul>
+          <li>← / → : Mover pieza</li>
+          <li>↓ : Soft drop</li>
+          <li>↑ : Rotar</li>
+          <li>Espacio : Hard drop</li>
+          <li>P : Pausar / reanudar</li>
+          <li>R : Reiniciar partida</li>
+        </ul>
+        <h2>Controles táctiles</h2>
+        <ul>
+          <li>⟳ : Rotar</li>
+          <li>◀ ▶ : Mover izquierda / derecha</li>
+          <li>▼ : Soft drop (mantener pulsado para repetir)</li>
+          <li>⤓ : Hard drop</li>
+        </ul>
+        <h2>Modos</h2>
+        <ul>
+          <li>Marathon: partida sin fin; la velocidad aumenta con el nivel.</li>
+          <li>Sprint: completa 40 líneas lo más rápido posible.</li>
+        </ul>
+      </div>
+      <button type="button" id="help-done-btn" class="primary-btn">Entendido</button>
+    </section>
+
+    <section id="screen-game" class="screen" hidden>
+      <h1 tabindex="-1" data-screen-focus class="visually-hidden">Partida en curso</h1>
+
+      <div class="stats-strip">
+        <div class="stat stat-next">
+          <span class="stat-label">Siguiente</span>
+          <canvas id="next-piece" width="80" height="80"></canvas>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Puntuación</span>
+          <span class="stat-value" id="score">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Líneas</span>
+          <span class="stat-value" id="lines">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Nivel</span>
+          <span class="stat-value" id="level">1</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Mejor</span>
+          <span class="stat-value" id="high-score">0</span>
+        </div>
+        <div class="stat" id="time-row" hidden>
+          <span class="stat-label">Tiempo</span>
+          <span class="stat-value" id="time">00:00.0</span>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <canvas id="board" width="300" height="600"></canvas>
+
+        <div class="overlay" id="overlay-pause" hidden aria-live="polite">
+          <p>Pausa</p>
+        </div>
+
+        <div class="overlay" id="overlay-end" hidden aria-live="polite">
+          <p id="game-over" hidden>Game Over</p>
+          <p id="victory" hidden>¡Sprint completado!</p>
+          <p id="new-high-score" hidden>¡Nueva puntuación máxima!</p>
+          <div class="overlay-actions">
+            <button type="button" id="retry-btn" class="primary-btn">Reintentar</button>
+            <button type="button" id="menu-btn-end">Menú</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button type="button" id="pause-btn" aria-label="Pausa">⏸</button>
+        <button type="button" id="restart-btn" aria-label="Reiniciar">⟲</button>
+        <button type="button" id="menu-btn" aria-label="Volver al menú">☰</button>
+      </div>
+
+      <div class="touch-controls">
+        <button type="button" id="touch-rotate" aria-label="Rotar">⟳</button>
+        <button type="button" id="touch-left" aria-label="Mover izquierda">◀</button>
+        <button type="button" id="touch-down" aria-label="Bajar (soft drop)">▼</button>
+        <button type="button" id="touch-right" aria-label="Mover derecha">▶</button>
+        <button type="button" id="touch-hard-drop" aria-label="Caída instantánea (hard drop)">⤓</button>
+      </div>
+    </section>
   </main>
   <script type="module" src="dist/app.js"></script>
 </body>

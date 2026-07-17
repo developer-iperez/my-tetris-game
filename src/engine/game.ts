@@ -1,4 +1,4 @@
-import { BOARD_HEIGHT, BOARD_WIDTH, PieceType } from './constants.js';
+import { BOARD_HEIGHT, BOARD_WIDTH, GameMode, PieceType, SPRINT_TARGET_LINES } from './constants.js';
 import { Board } from './board.js';
 import { Piece } from './piece.js';
 
@@ -9,21 +9,42 @@ const DROP_INTERVAL_DECREASE_PER_LEVEL_MS = 60;
 const MIN_DROP_INTERVAL_MS = 100;
 const WALL_KICK_OFFSETS = [0, 1, -1, 2, -2];
 
+export interface GameOptions {
+  startLevel?: number;
+  mode?: GameMode;
+  targetLines?: number;
+}
+
 export class Game {
   readonly board: Board;
+  readonly mode: GameMode;
+  // Sprint only: line count that ends the run in a win. Null in Marathon.
+  readonly targetLines: number | null;
   current: Piece;
   next: PieceType;
   score = 0;
   lines = 0;
-  level = 1;
+  level: number;
   isGameOver = false;
+  // Sprint reached; distinct from isGameOver (topping out) so the UI can tell a win from a loss.
+  isVictory = false;
   // Exposed so a future options menu can toggle it at runtime.
   ghostPieceEnabled = true;
 
-  constructor(width: number = BOARD_WIDTH, height: number = BOARD_HEIGHT) {
+  private readonly startLevel: number;
+
+  constructor(width: number = BOARD_WIDTH, height: number = BOARD_HEIGHT, options: GameOptions = {}) {
     this.board = new Board(width, height);
+    this.mode = options.mode ?? 'marathon';
+    this.targetLines = this.mode === 'sprint' ? options.targetLines ?? SPRINT_TARGET_LINES : null;
+    this.startLevel = options.startLevel ?? 1;
+    this.level = this.startLevel;
     this.current = new Piece(Piece.randomType(), width);
     this.next = Piece.randomType();
+  }
+
+  private get isOver(): boolean {
+    return this.isGameOver || this.isVictory;
   }
 
   moveLeft(): boolean {
@@ -41,7 +62,7 @@ export class Game {
   }
 
   hardDrop(): void {
-    if (this.isGameOver) return;
+    if (this.isOver) return;
     while (this.tryMove(0, 1)) {
       // keep descending until it settles
     }
@@ -49,7 +70,7 @@ export class Game {
   }
 
   rotate(): boolean {
-    if (this.isGameOver) return false;
+    if (this.isOver) return false;
 
     const rotatedCells = this.current.rotatedCells();
     for (const dx of WALL_KICK_OFFSETS) {
@@ -66,7 +87,7 @@ export class Game {
 
   // Called on each gravity tick; returns false once the piece has locked.
   tick(): boolean {
-    if (this.isGameOver) return false;
+    if (this.isOver) return false;
     const moved = this.tryMove(0, 1);
     if (!moved) this.lockPiece();
     return moved;
@@ -78,8 +99,9 @@ export class Game {
     this.next = Piece.randomType();
     this.score = 0;
     this.lines = 0;
-    this.level = 1;
+    this.level = this.startLevel;
     this.isGameOver = false;
+    this.isVictory = false;
   }
 
   setGhostPieceEnabled(enabled: boolean): void {
@@ -89,7 +111,7 @@ export class Game {
   // Returns where `current` would land on hard drop, without mutating state.
   // Returns null when the ghost piece is disabled or the game has ended.
   getGhostPiece(): Piece | null {
-    if (!this.ghostPieceEnabled || this.isGameOver) return null;
+    if (!this.ghostPieceEnabled || this.isOver) return null;
 
     let ghost = this.current.clone();
     for (;;) {
@@ -108,7 +130,7 @@ export class Game {
   }
 
   private tryMove(dx: number, dy: number): boolean {
-    if (this.isGameOver) return false;
+    if (this.isOver) return false;
     const candidate = this.current.clone();
     candidate.x += dx;
     candidate.y += dy;
@@ -126,10 +148,14 @@ export class Game {
     if (clearedCount > 0) {
       this.lines += clearedCount;
       this.score += (SCORE_PER_LINES[clearedCount] ?? 0) * this.level;
-      this.level = Math.floor(this.lines / LINES_PER_LEVEL) + 1;
+      this.level = this.startLevel + Math.floor(this.lines / LINES_PER_LEVEL);
+
+      if (this.targetLines !== null && this.lines >= this.targetLines) {
+        this.isVictory = true;
+      }
     }
 
-    this.spawnNextPiece();
+    if (!this.isVictory) this.spawnNextPiece();
   }
 
   private spawnNextPiece(): void {
