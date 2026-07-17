@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "tsc: watch",
+      "type": "shell",
+      "command": "npx tsc --watch",
+      "isBackground": true,
+      "problemMatcher": "$tsc-watch",
+      "presentation": {
+        "reveal": "silent",
+        "group": "debug"
+      }
+    },
+    {
+      "label": "serve: static",
+      "type": "shell",
+      "command": "python3 -u -m http.server 8080",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "Serving HTTP"
+        }
+      },
+      "presentation": {
+        "reveal": "silent",
+        "group": "debug"
+      }
+    },
+    {
+      "label": "debug: build & serve",
+      "dependsOn": ["tsc: watch", "serve: static"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Tetris (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8080/index.html",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "preLaunchTask": "debug: build & serve",
+      "presentation": {
+        "hidden": false,
+        "group": "tetris"
+      }
+    },
+    {
+      "name": "Attach to Chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true
+    }
+  ]
+}
