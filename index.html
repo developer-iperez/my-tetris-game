@@ -68,33 +68,6 @@
     <section id="screen-game" class="screen" hidden>
       <h1 tabindex="-1" data-screen-focus class="visually-hidden">Partida en curso</h1>
 
-      <div class="stats-strip">
-        <div class="stat stat-next">
-          <span class="stat-label">Siguiente</span>
-          <canvas id="next-piece" width="80" height="80"></canvas>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Puntuación</span>
-          <span class="stat-value" id="score">0</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Líneas</span>
-          <span class="stat-value" id="lines">0</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Nivel</span>
-          <span class="stat-value" id="level">1</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">Mejor</span>
-          <span class="stat-value" id="high-score">0</span>
-        </div>
-        <div class="stat" id="time-row" hidden>
-          <span class="stat-label">Tiempo</span>
-          <span class="stat-value" id="time">00:00.0</span>
-        </div>
-      </div>
-
       <div class="board-wrap">
         <canvas id="board" width="300" height="600"></canvas>
 
@@ -113,10 +86,39 @@
         </div>
       </div>
 
-      <div class="action-bar">
-        <button type="button" id="pause-btn" aria-label="Pausa">⏸</button>
-        <button type="button" id="restart-btn" aria-label="Reiniciar">⟲</button>
-        <button type="button" id="menu-btn" aria-label="Volver al menú">☰</button>
+      <div class="side-panel">
+        <div class="stats-strip">
+          <div class="stat stat-next">
+            <span class="stat-label">Siguiente</span>
+            <canvas id="next-piece" width="80" height="80"></canvas>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Puntuación</span>
+            <span class="stat-value" id="score">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Líneas</span>
+            <span class="stat-value" id="lines">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Nivel</span>
+            <span class="stat-value" id="level">1</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Mejor</span>
+            <span class="stat-value" id="high-score">0</span>
+          </div>
+          <div class="stat" id="time-row" hidden>
+            <span class="stat-label">Tiempo</span>
+            <span class="stat-value" id="time">00:00.0</span>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button type="button" id="pause-btn" aria-label="Pausa">⏸</button>
+          <button type="button" id="restart-btn" aria-label="Reiniciar">⟲</button>
+          <button type="button" id="menu-btn" aria-label="Volver al menú">☰</button>
+        </div>
       </div>
 
       <div class="touch-controls">
