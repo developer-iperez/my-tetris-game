@@ -37,6 +37,16 @@
       "dependsOn": ["tsc: watch", "serve: static"],
       "dependsOrder": "parallel",
       "problemMatcher": []
+    },
+    {
+      "label": "debug: cleanup",
+      "type": "shell",
+      "command": "pkill -f 'tsc --watch' ; pkill -f 'http.server 8080' ; true",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
+      "problemMatcher": []
     }
   ]
 }

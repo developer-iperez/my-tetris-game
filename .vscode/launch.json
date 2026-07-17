@@ -9,6 +9,7 @@
       "webRoot": "${workspaceFolder}",
       "sourceMaps": true,
       "preLaunchTask": "debug: build & serve",
+      "postDebugTask": "debug: cleanup",
       "presentation": {
         "hidden": false,
         "group": "tetris"
