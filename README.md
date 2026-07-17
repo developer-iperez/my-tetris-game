@@ -10,10 +10,11 @@ Implementado y funcionando:
 - Renderizado en Canvas 2D, desacoplado del motor.
 - Controles de teclado.
 - HUD con puntuación, líneas y nivel.
+- Pausa (`P` o botón) y reinicio (`R` o botón) sin recargar la página.
 - PWA instalable con soporte offline (`manifest.json` + `service-worker.js`).
 - Configuración de depuración en VS Code (breakpoints en TypeScript vía source maps).
 
-No implementado todavía: multijugador, sonido, controles táctiles, pantallas de menú/pausa, persistencia de puntuación, iconos de la PWA, tests, CI/CD.
+No implementado todavía: multijugador, sonido, controles táctiles, pantalla de menú inicial, persistencia de puntuación, iconos de la PWA, tests, CI/CD.
 
 ## Puesta en marcha
 
@@ -61,6 +62,7 @@ Para depurar con breakpoints en el código TypeScript: abrir "Run and Debug" en 
 - Puntuación por líneas simultáneas (Tetris-like): 1→100, 2→300, 3→500, 4→800 puntos, multiplicado por el nivel actual.
 - Nivel = `floor(líneas_totales / 10) + 1`; cada nivel acelera la caída (`getDropIntervalMs`), con un mínimo de 100 ms.
 - HUD en vivo: puntuación, líneas y nivel; mensaje de "Game Over".
+- Pausa y reinicio: `Game.reset()` reinicia tablero/pieza/puntuación/nivel; `TetrisApp` cancela y relanza el bucle de caída sin recrear el `CanvasRenderer`. Mientras está en pausa se ignoran los movimientos (mover/rotar/drop).
 
 ### Controles actuales
 
@@ -70,14 +72,15 @@ Para depurar con breakpoints en el código TypeScript: abrir "Run and Debug" en 
 | ↓ | Soft drop |
 | ↑ | Rotar |
 | Espacio | Hard drop |
+| P | Pausar / reanudar |
+| R | Reiniciar partida |
 
-No hay pausa, reinicio ni menú: al terminar la partida hay que recargar la página.
+También hay botones "Pausa" y "Reiniciar" en el HUD equivalentes a las teclas. No hay pantalla de menú inicial: el juego arranca directamente al cargar la página.
 
 ### Funcionalidades pendientes (roadmap funcional)
 
 Ordenadas aproximadamente por impacto/esfuerzo:
 
-- **Reiniciar partida y pausa**: botón/tecla para pausar (`P`) y para reiniciar sin recargar la página. Requiere que `Game` exponga un método `reset()` y que `TetrisApp` pueda cancelar/relanzar el bucle sin recrear el `CanvasRenderer`.
 - **Vista previa de la siguiente pieza**: `game.next` ya existe en el motor; falta un segundo `<canvas>` o panel en el HUD que la dibuje.
 - **Hold piece**: guardar una pieza para usar más tarde (tecla típica `C` o `Shift`). Implica añadir estado `held: PieceType | null` y una regla de "solo un hold por pieza caída" en `Game`.
 - **Ghost piece**: sombra que muestra dónde caería la pieza actual con hard drop. Se calcula igual que `hardDrop()` pero sin mutar el estado (simular hasta que `isValidPosition` falle).
@@ -121,7 +124,7 @@ Ordenadas aproximadamente por impacto/esfuerzo:
 
 ### Estado actual
 
-- Interfaz mínima: título, tablero centrado, HUD lateral con puntuación/líneas/nivel, texto de "Game Over".
+- Interfaz mínima: título, tablero centrado, HUD lateral con puntuación/líneas/nivel, texto de "Game Over"/"Pausa" y botones de pausa/reinicio.
 - Tema oscuro fijo (`color-scheme: dark` en `css/styles.css`), sin alternancia claro/oscuro.
 - Solo control por teclado; no hay soporte táctil ni de gamepad. En móvil, hoy el juego es prácticamente injugable.
 - Sin feedback sonoro ni animaciones (las líneas desaparecen de forma instantánea, sin transición).
