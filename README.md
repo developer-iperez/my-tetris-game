@@ -11,6 +11,7 @@ Implementado y funcionando:
 - Controles de teclado.
 - HUD con puntuación, líneas y nivel.
 - Pausa (`P` o botón) y reinicio (`R` o botón) sin recargar la página.
+- Vista previa de la siguiente pieza.
 - PWA instalable con soporte offline (`manifest.json` + `service-worker.js`).
 - Configuración de depuración en VS Code (breakpoints en TypeScript vía source maps).
 
@@ -39,7 +40,7 @@ Para depurar con breakpoints en el código TypeScript: abrir "Run and Debug" en 
 ├── css/
 ├── src/
 │   ├── engine/       # Board, Piece, Game — lógica pura, sin dependencias de DOM/canvas
-│   ├── renderer/       # CanvasRenderer — lee el estado de Game y dibuja en <canvas>
+│   ├── renderer/       # CanvasRenderer (tablero) y NextPieceRenderer (siguiente pieza) — leen Game y dibujan en <canvas>
 │   ├── ui/             # Hud, KeyboardControls
 │   ├── network/        # cliente de señalización WebRTC (pendiente, ver Roadmap técnico)
 │   └── app.ts           # TetrisApp: conecta motor + renderer + ui, dueño del bucle de juego
@@ -63,6 +64,7 @@ Para depurar con breakpoints en el código TypeScript: abrir "Run and Debug" en 
 - Nivel = `floor(líneas_totales / 10) + 1`; cada nivel acelera la caída (`getDropIntervalMs`), con un mínimo de 100 ms.
 - HUD en vivo: puntuación, líneas y nivel; mensaje de "Game Over".
 - Pausa y reinicio: `Game.reset()` reinicia tablero/pieza/puntuación/nivel; `TetrisApp` cancela y relanza el bucle de caída sin recrear el `CanvasRenderer`. Mientras está en pausa se ignoran los movimientos (mover/rotar/drop).
+- Vista previa de la siguiente pieza: `NextPieceRenderer` (`src/renderer/next-piece-renderer.ts`) dibuja `game.next` en un `<canvas>` propio del HUD (`#next-piece`), centrado en una rejilla 4×4, reutilizando `PIECE_SHAPES`/`PIECE_COLORS` del motor.
 
 ### Controles actuales
 
@@ -81,7 +83,6 @@ También hay botones "Pausa" y "Reiniciar" en el HUD equivalentes a las teclas. 
 
 Ordenadas aproximadamente por impacto/esfuerzo:
 
-- **Vista previa de la siguiente pieza**: `game.next` ya existe en el motor; falta un segundo `<canvas>` o panel en el HUD que la dibuje.
 - **Hold piece**: guardar una pieza para usar más tarde (tecla típica `C` o `Shift`). Implica añadir estado `held: PieceType | null` y una regla de "solo un hold por pieza caída" en `Game`.
 - **Ghost piece**: sombra que muestra dónde caería la pieza actual con hard drop. Se calcula igual que `hardDrop()` pero sin mutar el estado (simular hasta que `isValidPosition` falle).
 - **Bolsa de 7 piezas ("7-bag")**: sustituir `Piece.randomType()` (aleatorio uniforme puro) por una bolsa que garantiza las 7 piezas una vez cada 7 turnos, como en el Tetris moderno (Guideline). Cambio aislado en `piece.ts`/`game.ts`.

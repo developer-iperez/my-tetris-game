@@ -27,9 +27,27 @@ canvas {
 
 .hud {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
   font-size: 1.1rem;
+}
+
+.next-piece {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.next-piece p {
+  margin: 0;
+}
+
+.next-piece canvas {
+  width: 80px;
+  height: 80px;
 }
 
 #game-over {

@@ -1,19 +1,26 @@
 import { Game } from './engine/game.js';
 import { CanvasRenderer } from './renderer/canvas-renderer.js';
+import { NextPieceRenderer } from './renderer/next-piece-renderer.js';
 import { KeyboardControls } from './ui/keyboard-controls.js';
 import { Hud } from './ui/hud.js';
 
 class TetrisApp {
   private readonly game: Game;
   private readonly renderer: CanvasRenderer;
+  private readonly nextPieceRenderer: NextPieceRenderer;
   private readonly hud: Hud;
   private readonly controls: KeyboardControls;
   private dropTimerId: ReturnType<typeof setTimeout> | undefined;
   private isPaused = false;
 
-  constructor(canvas: HTMLCanvasElement, hudElements: ConstructorParameters<typeof Hud>[0]) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    nextPieceCanvas: HTMLCanvasElement,
+    hudElements: ConstructorParameters<typeof Hud>[0],
+  ) {
     this.game = new Game();
     this.renderer = new CanvasRenderer(canvas, this.game);
+    this.nextPieceRenderer = new NextPieceRenderer(nextPieceCanvas);
     this.hud = new Hud(hudElements);
     this.controls = new KeyboardControls({
       moveLeft: () => this.act(() => this.game.moveLeft()),
@@ -58,6 +65,7 @@ class TetrisApp {
 
   private refresh(): void {
     this.renderer.render(this.game);
+    this.nextPieceRenderer.render(this.game.next);
     this.hud.update(this.game, this.isPaused);
   }
 
@@ -78,7 +86,7 @@ function getRequiredElement<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
-const app = new TetrisApp(getRequiredElement('board'), {
+const app = new TetrisApp(getRequiredElement('board'), getRequiredElement('next-piece'), {
   scoreEl: getRequiredElement('score'),
   linesEl: getRequiredElement('lines'),
   levelEl: getRequiredElement('level'),
