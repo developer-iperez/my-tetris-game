@@ -60,6 +60,11 @@ canvas {
   font-weight: bold;
 }
 
+#new-high-score {
+  color: #00e050;
+  font-weight: bold;
+}
+
 .controls {
   display: flex;
   gap: 0.5rem;
