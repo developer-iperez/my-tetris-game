@@ -8,10 +8,13 @@ Initial scaffold implemented in TypeScript (OOP). `README.md` remains a captured
 
 ## Build & run
 
-- `npm install` — install dev dependencies (TypeScript only, no runtime deps).
+- `npm install` — install dev dependencies (TypeScript, browser-sync, concurrently; no runtime deps).
 - `npm run build` — compile `src/**/*.ts` to `dist/` via `tsc` (strict mode).
 - `npm run watch` — incremental compile on change.
-- `npm run serve` — build, then serve the repo root with `python3 -m http.server 8080`.
+- `npm run serve` — build, then serve the repo root on port 8080 via `browser-sync`, which live-reloads the browser whenever `dist/`, `css/`, `index.html`, or `manifest.json` change.
+- `npm run dev` — build once, then run `watch` and `serve` together (equivalent to the VS Code "Debug Tetris (Chrome)" launch config's preLaunchTask).
+- The VS Code debugger (`.vscode/launch.json` → "Debug Tetris (Chrome)") runs a blocking `tsc` build first, then starts `tsc --watch` + `browser-sync` in the background, so the debug session always starts from freshly compiled output and live-reloads on save.
+- `service-worker.js` caches `dist/*.js` cache-first with no revalidation; `src/app.ts` skips registering it (and clears any previously registered one) on `localhost`/`127.0.0.1` so local iteration never serves a stale cached build. It still registers normally in production.
 
 There is no bundler: `dist/` mirrors `src/`'s structure and is loaded directly via ES module `<script type="module">` tags. `dist/` is generated and gitignored — run `npm run build` before opening `index.html` or deploying.
 

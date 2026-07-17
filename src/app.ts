@@ -261,8 +261,19 @@ const app = new TetrisApp(
 
 app.start();
 
+const isLocalDev = ['localhost', '127.0.0.1'].includes(location.hostname);
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    if (isLocalDev) {
+      // The service worker caches dist/*.js cache-first with no update
+      // check, which would otherwise keep serving stale builds while
+      // iterating locally. Keep it unregistered (and its cache cleared)
+      // on localhost; production (GitHub Pages) still gets offline support.
+      navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister()));
+      caches.keys().then((keys) => keys.forEach((key) => caches.delete(key)));
+      return;
+    }
     navigator.serviceWorker.register('service-worker.js').catch(() => {
       // offline support is optional; ignore registration failures
     });

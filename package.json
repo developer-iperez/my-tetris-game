@@ -7,9 +7,12 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "serve": "npm run build && python3 -m http.server 8080"
+    "serve": "npm run build && browser-sync start --server --port 8080 --no-open --no-notify --no-ui --files \"dist/**/*.js\" \"css/**/*.css\" \"index.html\" \"manifest.json\"",
+    "dev": "npm run build && concurrently -k \"npm:watch\" \"browser-sync start --server --port 8080 --no-open --no-notify --no-ui --files 'dist/**/*.js' 'css/**/*.css' 'index.html' 'manifest.json'\""
   },
   "devDependencies": {
+    "browser-sync": "^3.0.4",
+    "concurrently": "^10.0.3",
     "typescript": "^5.9.3"
   }
 }

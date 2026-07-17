@@ -2,6 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "build: once",
+      "type": "shell",
+      "command": "npx tsc",
+      "problemMatcher": "$tsc"
+    },
+    {
       "label": "tsc: watch",
       "type": "shell",
       "command": "npx tsc --watch",
@@ -13,9 +19,9 @@
       }
     },
     {
-      "label": "serve: static",
+      "label": "serve: livereload",
       "type": "shell",
-      "command": "python3 -u -m http.server 8080",
+      "command": "npx browser-sync start --server --port 8080 --no-open --no-notify --no-ui --files \"dist/**/*.js\" \"css/**/*.css\" \"index.html\" \"manifest.json\"",
       "isBackground": true,
       "problemMatcher": {
         "pattern": {
@@ -24,7 +30,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".",
-          "endsPattern": "Serving HTTP"
+          "endsPattern": "Local:"
         }
       },
       "presentation": {
@@ -34,14 +40,14 @@
     },
     {
       "label": "debug: build & serve",
-      "dependsOn": ["tsc: watch", "serve: static"],
-      "dependsOrder": "parallel",
+      "dependsOn": ["build: once", "tsc: watch", "serve: livereload"],
+      "dependsOrder": "sequence",
       "problemMatcher": []
     },
     {
       "label": "debug: cleanup",
       "type": "shell",
-      "command": "pkill -f 'tsc --watch' ; pkill -f 'http.server 8080' ; true",
+      "command": "pkill -f 'tsc --watch' ; pkill -f 'browser-sync' ; true",
       "presentation": {
         "reveal": "silent",
         "panel": "shared"
