@@ -6,14 +6,21 @@ export interface TouchControlElements {
   softDrop: HTMLElement;
   hardDrop: HTMLElement;
   rotate: HTMLElement;
+  board: HTMLElement;
 }
 
 const REPEAT_INTERVAL_MS = 120;
 const REPEAT_INITIAL_DELAY_MS = 250;
 
+const isTouchPointer = (event: PointerEvent): boolean => event.pointerType === 'touch';
+
 // On-screen d-pad for touch devices. Left/right/soft-drop repeat while held,
 // mirroring how holding an arrow key behaves on a keyboard; rotate and hard
 // drop only ever fire once per press.
+//
+// Soft drop can also be triggered by pressing on the board grid itself
+// (touch only, so mouse clicks on the board on desktop are unaffected); the
+// dedicated soft-drop button is kept in the DOM for non-touch pointers.
 export class TouchControls {
   private readonly cleanupFns: Array<() => void> = [];
 
@@ -21,6 +28,7 @@ export class TouchControls {
     this.bindRepeating(elements.left, actions.moveLeft);
     this.bindRepeating(elements.right, actions.moveRight);
     this.bindRepeating(elements.softDrop, actions.softDrop);
+    this.bindRepeating(elements.board, actions.softDrop, isTouchPointer);
     this.bindSingle(elements.hardDrop, actions.hardDrop);
     this.bindSingle(elements.rotate, actions.rotate);
   }
@@ -39,7 +47,7 @@ export class TouchControls {
     this.cleanupFns.push(() => el.removeEventListener('pointerdown', handler));
   }
 
-  private bindRepeating(el: HTMLElement, action: () => void): void {
+  private bindRepeating(el: HTMLElement, action: () => void, filter?: (event: PointerEvent) => boolean): void {
     let repeatTimerId: ReturnType<typeof setInterval> | undefined;
     let initialDelayId: ReturnType<typeof setTimeout> | undefined;
 
@@ -51,6 +59,7 @@ export class TouchControls {
     };
 
     const onPointerDown = (event: PointerEvent): void => {
+      if (filter && !filter(event)) return;
       event.preventDefault();
       action();
       initialDelayId = setTimeout(() => {

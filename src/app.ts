@@ -255,6 +255,7 @@ const app = new TetrisApp(
     right: getRequiredElement('touch-right'),
     softDrop: getRequiredElement('touch-down'),
     hardDrop: getRequiredElement('touch-hard-drop'),
+    board: getRequiredElement('board'),
   },
 );
 
