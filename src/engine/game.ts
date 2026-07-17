@@ -70,6 +70,16 @@ export class Game {
     return moved;
   }
 
+  reset(): void {
+    this.board.reset();
+    this.current = new Piece(Piece.randomType(), this.board.width);
+    this.next = Piece.randomType();
+    this.score = 0;
+    this.lines = 0;
+    this.level = 1;
+    this.isGameOver = false;
+  }
+
   getDropIntervalMs(): number {
     return Math.max(
       MIN_DROP_INTERVAL_MS,

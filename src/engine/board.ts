@@ -40,6 +40,10 @@ export class Board {
     return this.isInside(cells) && !this.hasCollision(cells);
   }
 
+  reset(): void {
+    this.grid = Board.createEmptyGrid(this.width, this.height);
+  }
+
   merge(cells: Point[], type: PieceType): void {
     cells.forEach(({ x, y }) => {
       if (y >= 0) {

@@ -9,6 +9,7 @@ class TetrisApp {
   private readonly hud: Hud;
   private readonly controls: KeyboardControls;
   private dropTimerId: ReturnType<typeof setTimeout> | undefined;
+  private isPaused = false;
 
   constructor(canvas: HTMLCanvasElement, hudElements: ConstructorParameters<typeof Hud>[0]) {
     this.game = new Game();
@@ -20,6 +21,8 @@ class TetrisApp {
       softDrop: () => this.act(() => this.game.softDrop()),
       hardDrop: () => this.act(() => this.game.hardDrop()),
       rotate: () => this.act(() => this.game.rotate()),
+      togglePause: () => this.togglePause(),
+      restart: () => this.restart(),
     });
   }
 
@@ -28,19 +31,39 @@ class TetrisApp {
     this.scheduleDrop();
   }
 
+  togglePause(): void {
+    if (this.game.isGameOver) return;
+    this.isPaused = !this.isPaused;
+    if (this.isPaused) {
+      clearTimeout(this.dropTimerId);
+    } else {
+      this.scheduleDrop();
+    }
+    this.refresh();
+  }
+
+  restart(): void {
+    this.isPaused = false;
+    clearTimeout(this.dropTimerId);
+    this.game.reset();
+    this.refresh();
+    this.scheduleDrop();
+  }
+
   private act(action: () => void): void {
+    if (this.isPaused || this.game.isGameOver) return;
     action();
     this.refresh();
   }
 
   private refresh(): void {
     this.renderer.render(this.game);
-    this.hud.update(this.game);
+    this.hud.update(this.game, this.isPaused);
   }
 
   private scheduleDrop(): void {
     clearTimeout(this.dropTimerId);
-    if (this.game.isGameOver) return;
+    if (this.game.isGameOver || this.isPaused) return;
     this.dropTimerId = setTimeout(() => {
       this.game.tick();
       this.refresh();
@@ -60,7 +83,12 @@ const app = new TetrisApp(getRequiredElement('board'), {
   linesEl: getRequiredElement('lines'),
   levelEl: getRequiredElement('level'),
   gameOverEl: getRequiredElement('game-over'),
+  pausedEl: getRequiredElement('paused'),
+  pauseButton: getRequiredElement('pause-btn'),
 });
+
+getRequiredElement<HTMLButtonElement>('pause-btn').addEventListener('click', () => app.togglePause());
+getRequiredElement<HTMLButtonElement>('restart-btn').addEventListener('click', () => app.restart());
 
 app.start();
 

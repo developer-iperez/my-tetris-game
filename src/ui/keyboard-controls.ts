@@ -4,6 +4,8 @@ export interface ControlActions {
   softDrop(): void;
   hardDrop(): void;
   rotate(): void;
+  togglePause(): void;
+  restart(): void;
 }
 
 export class KeyboardControls {
@@ -22,6 +24,10 @@ export class KeyboardControls {
       ArrowDown: actions.softDrop,
       ArrowUp: actions.rotate,
       ' ': actions.hardDrop,
+      p: actions.togglePause,
+      P: actions.togglePause,
+      r: actions.restart,
+      R: actions.restart,
     };
     window.addEventListener('keydown', this.handleKeyDown);
   }
